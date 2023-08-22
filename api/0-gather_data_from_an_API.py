@@ -1,23 +1,14 @@
 #!/usr/bin/python3
-'''Returns information about'''
+'''Returns information about the specified database'''
 import requests
 import sys
 
-
-def get_employee_todo_list(employee_id):
-    user = requests.get(f"https://jsonplaceholder.typicode.com/users/{employee_id}").json()
-    todos = requests.get(f"https://jsonplaceholder.typicode.com/todos?userId={employee_id}").json()
-    
-    done_tasks = [task["title"] for task in todos if task["completed"]]
-    total_tasks = len(todos)
-    
-    print(f"Employee {user['name']} is done with tasks ({len(done_tasks)}/{total_tasks}):")
-    for task in done_tasks:
-        print(f"\t{task}")
-        
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: python script.py <employee_id>")
-    else:
-        employee_id = int(sys.argv[1])
-        get_employee_todo_list(employee_id)
+    url = "https://jsonplaceholder.typicode.com/"
+    user = requests.get(url + "users/{}".format(sys.argv[1])).json()
+    todos = requests.get(url + "todos", params={"userId": sys.argv[1]}).json()
+
+    completed = [t.get("title") for t in todos if t.get("completed") is True]
+    print("Employee {} is done with tasks({}/{}):".format(
+        user.get("name"), len(completed), len(todos)))
+    [print("\t {}".format(c)) for c in completed]
